@@ -1,18 +1,24 @@
 package week4.Day1.Assignment;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import io.github.bonigarcia.wdm.managers.ChromeDriverManager;
 
 public class ServiceNow {
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 		// TODO Auto-generated method stub
 		ChromeDriverManager.chromedriver().setup();
 		ChromeDriver driver= new ChromeDriver();
@@ -36,14 +42,32 @@ public class ServiceNow {
 		driver.switchTo().window(l.get(1));
 		driver.findElement(By.xpath("//a[@class='glide_ref_item_link']")).click();
 		driver.switchTo().window(l.get(0));
+		driver.switchTo().defaultContent();
+		driver.switchTo().frame("gsft_main");
 driver.findElement(By.xpath("//input[@id='incident.short_description']")).sendKeys("Test");
-/*
- * Set<String> L = driver.getWindowHandles(); List<String> i= new
- * ArrayList<String>(L); driver.switchTo().window(i.get(1));
- * driver.findElement(By.
- * xpath("(//td[@class='list_decoration_cell col-small col-center '])[1]/following::td/a"
- * )).click();
- */
+String val=driver.findElement(By.id("incident.number")).getAttribute("value");
+System.out.println(val);
+driver.findElement(By.id("sysverb_insert_bottom")).click();
+driver.switchTo().window(l.get(0));
+WebElement frm= driver.findElementByXPath("//div[@class='navpage-main-left ng-isolate-scope']/iframe"); 
+driver.switchTo().frame(frm);
+WebElement A = driver.findElement(By.xpath("(//input[@class='form-control'])[1]"));
+A.sendKeys(val);
+A.sendKeys(Keys.ENTER);
+WebElement id = driver.findElement(By.xpath("(//a[@class='linked formlink'])"));
+String ver=id.getText();
+if (val.equals(ver)) {
+	System.out.println("Incident created successfully");
+}
+else {
+	System.out.println("Incident not created");
+}
+
+File src1 = driver.getScreenshotAs(OutputType.FILE);
+File dst = new File("./snaps/snow.png");
+FileUtils.copyFile(src1, dst);
+
+
 	}
 
 }
